@@ -1,0 +1,3 @@
+[submodule "src/NBodySimulator"]
+	path = src/NBodySimulator
+	url = git@github.com:rLadia/NBodySimulator.git
