@@ -131,17 +131,24 @@
 
   function convertToViewData(modelData) {
     for(var i = 0; i < numItems; ++i) {
-      if(modelData.get(i).isDead) {
+      var obj = modelData.get(i);
+
+      if(obj.isDead) {
         items[i].isDead = true;
+        obj.delete();
         continue;
       }
 
-      var x = modelData.get(i).position.x;
-      var y = modelData.get(i).position.y;
-      var screenCoord = toScreenCoords(x, y);
+      var pos = obj.position;
+      //var x = obj.position.x;
+      //var y = obj.position.y;
+      var screenCoord = toScreenCoords(pos.x, pos.y);
+      pos.delete();
 
       items[i].x = screenCoord.x;
       items[i].y = screenCoord.y;
+
+      obj.delete();
     }
   };
   
@@ -174,34 +181,45 @@
   function keepInBounds() {
     for(var i = 0; i < numItems; ++i) {
       data = modelData.get(i);
-      if(data.isDead)
+      if(data.isDead) {
+        data.delete();
         continue;  
-
-      // if object is outside of the boundary, moves it to the other side
-      if(isOutsideModel(data)) {
-        var newPosition = moveToOppositeBoundary(data);
-        data.position = newPosition;
       }
 
-      var newSpeed = reduceSpeed(modelData.get(i));
+      var currentPosition = data.position;
+      
+      // if object is outside of the boundary, moves it to the other side
+      if(isOutsideModel(currentPosition)) {
+        var newPosition = moveToOppositeBoundary(currentPosition);
+        data.position = newPosition;
+        newPosition.delete();
+      }
+      
+      var currentVelocity = data.velocity;
+      var newSpeed = reduceSpeed(currentVelocity);
       data.velocity = newSpeed;
+      newSpeed.delete();
 
       modelData.set(i, data);
+
+      data.delete();
+      currentPosition.delete();
+      currentVelocity.delete();
     }
 
   }
 
-  function isOutsideModel(object) {
-    var x = object.position.x;
-    var y = object.position.y;
+  function isOutsideModel(position) {
+    var x = position.x;
+    var y = position.y;
 
     return (x < 0 || x > modelWidth 
         || y < 0 || y > modelHeight);
   }
 
-  function moveToOppositeBoundary(object) {
-    var x = object.position.x;
-    var y = object.position.y;
+  function moveToOppositeBoundary(position) {
+    var x = position.x;
+    var y = position.y;
 
     if(y > modelHeight)
       y -= modelHeight;
@@ -216,9 +234,9 @@
     return new Module.NVector(x,y);
   }
 
-  function reduceSpeed(object) {
-    var dx = object.velocity.x;
-    var dy = object.velocity.y;
+  function reduceSpeed(velocity) {
+    var dx = velocity.x;
+    var dy = velocity.y;
 
     var maxSpeed = 50;
     var dragX = 0; // amount to modify speed
