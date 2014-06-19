@@ -1,9 +1,25 @@
-CC=~/bin/emscripten/emcc
-OUT=~/Dropbox/TheFishcube/dev/pages/JSimulator/js
+EMCC=~/bin/emscripten/emcc
+OUT=../jsimulator/js
+
+SRC_DIR=NBodySimulator/src
+
+src = gravity.cpp \
+      model.cpp \
+      modelobject.cpp \
+      nbodysimulator.cpp \
+      overlap.cpp \
+
+test_src = display.cpp \
+           main.cpp \
+           tablelogger.cpp \
+           test_data.cpp \
+           test_model.cpp \
+           util.cpp \
+
+objects = $(src:%.cpp=$(SRC_DIR)/%.cpp)
+test_objects = $(test_src:%.cpp=$(OBJ_DIR)/%.o)
 
 main:
-	$(CC) -DNDEBUG src/*.cpp --bind jsimulator.cpp -o c++simulator.js
+	$(EMCC) -DNDEBUG $(objects) --bind jsimulator.cpp -o c++simulator.js
 	mv c++simulator.js* $(OUT)
 
-test:
-	g++ -std=c++11 *.cpp test/*.cpp -o TestAll

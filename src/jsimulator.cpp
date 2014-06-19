@@ -1,5 +1,5 @@
-#include "src/modelobject.h"
-#include "src/model.h"
+#include "NBodySimulator/src/modelobject.h"
+#include "NBodySimulator/src/model.h"
 #include <emscripten/bind.h>
 
 using namespace emscripten;
