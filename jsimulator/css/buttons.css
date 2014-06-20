@@ -5,9 +5,9 @@ button.simulatorcontrol {
   border-left: solid 2px #eaeaea;
   border-bottom: solid 2px #777;
   border-right: solid 2px #777;
-  /*  padding:15px;  */ 
+  /*  padding:15px;  */
   height:48px;
-  width:48px;    
+  width:48px;
 }
 
 button.down {

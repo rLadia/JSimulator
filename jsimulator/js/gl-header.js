@@ -11,9 +11,9 @@
 
   LadiaWebGL.init = function(canvasId){
     var deferred = $.Deferred();
-    
+
     var canvas = document.getElementById(canvasId);
-    
+
     initGL(canvas);
     $.when(
       initShaders(),
@@ -23,7 +23,7 @@
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       deferred.resolve();
     });
-    
+
     return deferred;
   }
 
@@ -55,7 +55,7 @@
   function getShader(gl, id) {
     var shaderType = id.slice(-2);
     var shader;
-    
+
     if (shaderType == "fs") {
       shader = gl.createShader(gl.FRAGMENT_SHADER);
     } else if (shaderType == "vs") {
@@ -84,7 +84,7 @@
 
   function initShaders() {
     var deferred = new $.Deferred(); // defer until shaders have been initialized
-    
+
     $.when(
       loadShaderSrc(shaders, "shader-fs"),
       loadShaderSrc(shaders, "shader-vs")
@@ -115,7 +115,7 @@
       shaderProgram.colorUniform = gl.getUniformLocation(shaderProgram, "uColor");
       deferred.resolve();
     });
-    
+
     return deferred;
   }
 
@@ -131,7 +131,7 @@
 
   function initTexture() {
     var deferred = $.Deferred();
-    
+
     itemTexture = gl.createTexture();
     itemTexture.image = new Image();
     itemTexture.image.onload = function () {
@@ -171,28 +171,28 @@
   function initBuffers() {
     itemVertexPositionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, itemVertexPositionBuffer);
-    
+
     vertices = [
       -1.0, -1.0,  0.0,
       1.0, -1.0,  0.0,
       -1.0,  1.0,  0.0,
       1.0,  1.0,  0.0
     ];
-    
+
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
     itemVertexPositionBuffer.itemSize = 3;
     itemVertexPositionBuffer.numItems = 4;
 
     itemVertexTextureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, itemVertexTextureCoordBuffer);
-    
+
     var textureCoords = [
       0.0, 0.0,
       1.0, 0.0,
       0.0, 1.0,
       1.0, 1.0
     ];
-    
+
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
     itemVertexTextureCoordBuffer.itemSize = 2;
     itemVertexTextureCoordBuffer.numItems = 4;

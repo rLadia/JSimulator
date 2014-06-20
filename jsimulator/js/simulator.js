@@ -4,15 +4,15 @@
   var modelData = new Module.MOVector(); // stores model data for each object
   var items = []; // stores the view data of each object
   var lastUpdatedTime; // time since last update
-  
+
   var play = false; // used to toggle the running state of the simulation
   var speedMultiplier = 5;
   var maxSpeedMultiplier = 20;
-  
+
   var modelWidth = 1000;
   var modelHeight = 1000;
   var numItems = 7;
- 
+
   Simulator.init = function() {
     $.when(
       LadiaWebGL.init("simulator-canvas"),
@@ -21,29 +21,29 @@
       LadiaWebGL.drawScene(items);
     });
   };
-  
+
   Simulator.play = function() {
     play = true;
     startUpdateLoop();
   };
-  
+
   Simulator.pause = function() {
     play = false;
   };
-  
+
   // changes the speed of the simulation
   // the speed is capped at +- maxSpeedMultiplier
   Simulator.setSimulationSpeed = function(newSpeed) {
     if(newSpeed <= maxSpeedMultiplier && newSpeed >= 1)
       speedMultiplier = newSpeed;
   };
- 
+
   Simulator.point = function(x, y) {
     this.x = x;
     this.y = y;
     this.time = 0;
   };
- 
+
   // Holds information about how the item should be drawn
   Simulator.Item = function(index, x, y, r, g, b) {
     this.isDead = false;
@@ -51,24 +51,24 @@
     this.x = x;
     this.y = y;
     this.z = 0;
-   
+
     this.r = r;
     this.g = g;
     this.b = b;
     this.tail = []; // array of points
   };
-  
+
   // adds the current position to the tail array and gets rid of old tail sections
   Simulator.Item.prototype.AddTailPoint = function(time) {
     var len = this.tail.length;
     for (var i = 0; i < len; ++i) {
       this.tail[i].time += time;
-      
+
       // remove old tails from the array
       if(this.tail[i].time > 2000) {
         this.tail.splice(i, len-i);
         break;
-      }  
+      }
     }
     this.tail.push(new Simulator.point(this.x, this.y));
   };
@@ -79,7 +79,7 @@
     this.g = Math.random();
     this.b = Math.random();
   };
-  
+
   Simulator.Item.prototype.toString = function() {
     return "Index: " + this.index + "\nx,y,z: " + this.x + ", " + this.y + ", " + this.yz;
   };
@@ -89,34 +89,34 @@
     if(play)
       requestAnimFrame(update);
   };
-  
+
   function initDemoData() {
     var deferred = $.Deferred();
     var mid = Math.floor(numItems / 2);
-    
+
     for (var i=0; i < numItems; i++) {
       // equally spaced around center
       var x = modelWidth / 2 + (mid - i) * (modelWidth / (numItems + 1));
       var y = modelHeight / 2;
       var dx = 0;
       var dy = (i-mid)*6;
-            
+
       // create view data
       var screenCoord = toScreenCoords(x, y);
-      items.push(new Simulator.Item(i, screenCoord.x, screenCoord.y, 
+      items.push(new Simulator.Item(i, screenCoord.x, screenCoord.y,
                                     Math.random(), Math.random(), Math.random()));
 
       modelData.push_back(new Module.ModelObject(
         new Module.NVector(x, y), // position
-        new Module.NVector(dx, dy), // velocity 
-        new Module.NVector(0, 0), // force 
+        new Module.NVector(dx, dy), // velocity
+        new Module.NVector(0, 0), // force
         1000, // mass
         1, // radius
         i // index
       ));
-      
+
     }
-    
+
     deferred.resolve();
     return deferred;
   };
@@ -151,14 +151,14 @@
       obj.delete();
     }
   };
-  
+
   function toScreenCoords(x, y) {
     var screenWidth = 17;
     var screenHeight = 17;
-    
+
     var screenX = (x / modelWidth - 1/2) * screenWidth;
     var screenY = (y / modelWidth - 1/2) * screenWidth;
-    
+
     return {x: screenX, y: screenY};
   };
 
@@ -169,9 +169,9 @@
       items[i].AddTailPoint(time);
     }*/
 
-    cppSimulator.update(modelData, time * (speedMultiplier / 1000)); 
+    cppSimulator.update(modelData, time * (speedMultiplier / 1000));
     keepInBounds();
-  
+
     convertToViewData(modelData);
 
     deferred.resolve();
@@ -183,18 +183,18 @@
       data = modelData.get(i);
       if(data.isDead) {
         data.delete();
-        continue;  
+        continue;
       }
 
       var currentPosition = data.position;
-      
+
       // if object is outside of the boundary, moves it to the other side
       if(isOutsideModel(currentPosition)) {
         var newPosition = moveToOppositeBoundary(currentPosition);
         data.position = newPosition;
         newPosition.delete();
       }
-      
+
       var currentVelocity = data.velocity;
       var newSpeed = reduceSpeed(currentVelocity);
       data.velocity = newSpeed;
@@ -213,7 +213,7 @@
     var x = position.x;
     var y = position.y;
 
-    return (x < 0 || x > modelWidth 
+    return (x < 0 || x > modelWidth
         || y < 0 || y > modelHeight);
   }
 
@@ -230,7 +230,7 @@
       x -= modelWidth;
     else if(x < 0)
       x += modelWidth;
-    
+
     return new Module.NVector(x,y);
   }
 
@@ -256,10 +256,10 @@
   }
 
   function update() {
-    if(play == false) { 
+    if(play == false) {
       return; // stop the loop
     }
-    
+
     var time = timeSinceLastUpdate();
     $.when(
       updateModel(time),
@@ -269,7 +269,7 @@
         requestAnimFrame(update); },
         25 // do not update more than once every 25ms
       );
-      
+
     });
   };
 
