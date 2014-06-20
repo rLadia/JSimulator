@@ -1,7 +1,7 @@
 (function( Simulator, $, undefined ) {
 
   var cppSimulator = new Module.Model();
-  var modelData = new Module.MOVector(); // stores model data for each object
+  var modelData; // stores model data for each object
   var items = []; // stores the view data of each object
   var lastUpdatedTime; // time since last update
 
@@ -11,7 +11,7 @@
 
   var modelWidth = 1000;
   var modelHeight = 1000;
-  var numItems = 7;
+  var numItems;
 
   Simulator.init = function() {
     $.when(
@@ -92,7 +92,12 @@
 
   function initDemoData() {
     var deferred = $.Deferred();
+
+    numItems = 7;
     var mid = Math.floor(numItems / 2);
+
+    modelData = new Module.MOVector(); // stores model data for each object
+    items = [];
 
     for (var i=0; i < numItems; i++) {
       // equally spaced around center
@@ -106,19 +111,32 @@
       items.push(new Simulator.Item(i, screenCoord.x, screenCoord.y,
                                     Math.random(), Math.random(), Math.random()));
 
-      modelData.push_back(new Module.ModelObject(
-        new Module.NVector(x, y), // position
-        new Module.NVector(dx, dy), // velocity
-        new Module.NVector(0, 0), // force
-        1000, // mass
-        1, // radius
-        i // index
-      ));
-
+      addModelObject(i, x, y, dx, dy);
     }
 
     deferred.resolve();
     return deferred;
+  };
+
+  function addModelObject(index, x, y, dx, dy) {
+    var position = new Module.NVector(x, y);
+    var force = new Module.NVector(0, 0);
+    var velocity = new Module.NVector(dx, dy);
+
+    modelObject = new Module.ModelObject(
+        position, velocity, force,
+        1000, // mass
+        1,    // radius
+        index
+    );
+
+    modelData.push_back(modelObject);
+
+    modelObject.delete();
+    position.delete();
+    velocity.delete();
+    force.delete();
+
   };
 
   // returns the time since last call
@@ -140,8 +158,6 @@
       }
 
       var pos = obj.position;
-      //var x = obj.position.x;
-      //var y = obj.position.y;
       var screenCoord = toScreenCoords(pos.x, pos.y);
       pos.delete();
 
