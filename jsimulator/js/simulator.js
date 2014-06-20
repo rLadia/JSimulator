@@ -31,6 +31,18 @@
     play = false;
   };
 
+  Simulator.selectDemo = function() {
+    modelData.delete();
+    initDemoData();
+    LadiaWebGL.drawScene(items);
+  };
+
+  Simulator.selectRandom = function() {
+    modelData.delete();
+    initRandomData();
+    LadiaWebGL.drawScene(items);
+  };
+
   // changes the speed of the simulation
   // the speed is capped at +- maxSpeedMultiplier
   Simulator.setSimulationSpeed = function(newSpeed) {
@@ -88,6 +100,33 @@
     lastUpdatedTime = new Date().getTime();
     if(play)
       requestAnimFrame(update);
+  };
+
+  function initRandomData() {
+    var deferred = $.Deferred();
+    var mid = Math.floor(numItems / 2);
+
+    modelData = new Module.MOVector(); // stores model data for each object
+    items = [];
+
+    numItems = 15;
+    for (var i=0; i < numItems; i++) {
+      // equally spaced around center
+      var x = Math.random() * modelWidth;
+      var y = Math.random() * modelHeight;
+      var dx = Math.random() * modelWidth / 16 - modelWidth / 32;
+      var dy = Math.random() * modelHeight / 16 - modelWidth / 32;
+
+      // create view data
+      var screenCoord = toScreenCoords(x, y);
+      items.push(new Simulator.Item(i, screenCoord.x, screenCoord.y,
+                                    Math.random(), Math.random(), Math.random()));
+
+      addModelObject(i, x, y, dx, dy);
+    }
+
+    deferred.resolve();
+    return deferred;
   };
 
   function initDemoData() {

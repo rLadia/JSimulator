@@ -30,4 +30,12 @@ $(document).ready(function() {
     simulationSpeed ++;
     Simulator.setSimulationSpeed(simulationSpeed);
   });
+
+  $('#select-demo').click(function() {
+    Simulator.selectDemo();
+  });
+
+  $('#select-random').click(function() {
+    Simulator.selectRandom();
+  });
 });

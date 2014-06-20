@@ -10,6 +10,18 @@ button.simulatorcontrol {
   width:48px;
 }
 
+button.layout-selection{
+  background-repeat:no-repeat;
+  cursor: pointer;
+  border-top: solid 2px #eaeaea;
+  border-left: solid 2px #eaeaea;
+  border-bottom: solid 2px #777;
+  border-right: solid 2px #777;
+  /*  padding:15px;  */
+  height:48px;
+  width:96px;
+}
+
 button.down {
   background-repeat:no-repeat;
   border-top: solid 2px #777;
